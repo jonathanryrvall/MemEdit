@@ -1,0 +1,88 @@
+﻿<Window x:Class="MemEditGUI.Views.MainView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MemEditGUI"
+        mc:Ignorable="d"
+        Title="MemEdit" 
+        Height="600"
+        Width="800" 
+        Background="{DynamicResource PaperBrush}"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanMinimize" 
+        Icon="/MemEditGUI;component/Icon.ico">
+
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        
+        <Label Content="What memory do you wish to edit?" 
+               HorizontalAlignment="Center" 
+               HorizontalContentAlignment="Center" 
+               Margin="0,50,0,0"
+               VerticalAlignment="Top"
+               FontFamily="Segoe UI Light"
+               FontSize="20" Grid.ColumnSpan="2"/>
+
+        <Button x:Name="btnRAM" 
+                Content="Edit process RAM" 
+                HorizontalAlignment="Right" 
+                Margin="0,-120,10,0" 
+                VerticalAlignment="Center" 
+                Width="250"
+                Height="80" 
+                FontSize="16" 
+                Command="{Binding EditRamCommand}"
+                CommandParameter="{Binding ElementName=TestWindow}"/>
+        
+        <Button x:Name="btnFile"
+                Content="Edit file" 
+                HorizontalAlignment="Right"
+                Margin="0,120,10,0"
+                VerticalAlignment="Center"
+                Width="250"
+                Height="80" 
+                FontSize="16"
+                Command="{Binding EditFileCommand}"
+                CommandParameter="{Binding ElementName=TestWindow}"/>
+
+        <TextBlock x:Name="label" Foreground="{DynamicResource PaperTextEnabledBrush}" 
+                   TextWrapping="WrapWithOverflow"
+                   HorizontalAlignment="Left"
+                   Margin="10,-120,0,0"
+                   VerticalAlignment="Center"
+                   Height="80"
+                   Width="250"
+                   Grid.Column="1"
+                   FontSize="14">
+            <Run Text="Choose a process running on the machine, scan the memory to find addresses of interest. Edit the memory at the addresses."/>
+        </TextBlock>
+        
+        <TextBlock Foreground="{DynamicResource PaperTextEnabledBrush}"
+                   TextWrapping="WrapWithOverflow"
+                   HorizontalAlignment="Left" 
+                   Margin="10,120,0,0" 
+                   VerticalAlignment="Center" 
+                   Height="80" 
+                   Width="250" 
+                   Grid.Column="1" 
+                   FontSize="14">
+            <Run Text="Select a binary file, scan the memory to find addresses of interest. Edit the memory at the addresses."/>
+        </TextBlock>
+
+
+        <Button Grid.Column="1"
+                VerticalAlignment="Bottom"
+                HorizontalAlignment="Right"
+                Height="28"
+                Width="100"
+                Content="About"
+                Command="{Binding AboutCommand}"
+                Margin="0,0,20,20"/>
+    </Grid>
+
+</Window>

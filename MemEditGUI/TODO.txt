@@ -1,0 +1,13 @@
+﻿- Sanity check with warnings
+- Check if process has been exited 
+- Check if file exists
+
+
+- Lock addresses
+- Switch file path during runtime?
+- More file/process info in header (size, date moidifed, pid uptime) updated via timer
+- More tooltips
+- Make inputbox and messagebox more mvvm like
+- FAQ
+- Write actual value visible in table to memory on click (selected ones)
+-Delete warnings

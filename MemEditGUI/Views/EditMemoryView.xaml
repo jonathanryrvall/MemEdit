@@ -1,0 +1,503 @@
+﻿<Window x:Class="MemEditGUI.Views.EditMemoryView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MemEditGUI"
+        xmlns:scan="clr-namespace:MemEditGUI.Models.Scan"
+        mc:Ignorable="d"
+        Background="{DynamicResource PaperBrush}"
+        xmlns:conv="clr-namespace:MemEditGUI.Converters"
+         Icon="/MemEditGUI;component/Icon.ico"
+        Title="MemEdit"
+        Height="800"
+        Width="1100" 
+        WindowStartupLocation="CenterScreen">
+
+    <Window.TaskbarItemInfo>
+        <TaskbarItemInfo ProgressState="{Binding ScanProgressState, FallbackValue='None'}" />
+    </Window.TaskbarItemInfo>
+    <Window.Resources>
+        <conv:NullToBoolConverter x:Key="nullToBoolConverter" />
+        <conv:NullToBoolInverseConverter x:Key="nullToBoolInverseConverter" />
+        <conv:NullToVisibilityConverter x:Key="nullToVisConverter" />
+        <conv:InvertConverter x:Key="invertConverter" />
+        <conv:BooleanToHiddenConverter x:Key="booleanToHiddenConverter" />
+    </Window.Resources>
+    <Grid>
+        <!--Actual content-->
+        <Grid IsEnabled="{Binding IsScanning, Converter={StaticResource invertConverter}}">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="90"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+
+            <!--Process/File name-->
+            <Border Margin="20,20,20,10" 
+                Background="{DynamicResource TextBoxNormalBackground}" 
+                BorderBrush="{DynamicResource TextBoxNormalBorder}"
+                BorderThickness="1"
+                    Grid.Row="0"
+                DataContext="{Binding MemorySource}">
+                <Grid>
+                    <Image x:Name="image"
+                       HorizontalAlignment="Left" 
+                       Height="32"
+                       Margin="10,0,0,0" 
+                       VerticalAlignment="Stretch"
+                       Width="32"
+                       Source="{Binding Img}"/>
+                    <TextBlock Margin="60,-15,0,0" 
+                       VerticalAlignment="Center" 
+                       HorizontalAlignment="Left"
+                       Foreground="{DynamicResource PaperTextEnabledBrush}"
+                       FontSize="18"
+                       FontFamily="Segoe UI Light">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}{0} [{1}]" FallbackValue="NAME">
+                                <Binding Path="Name" />
+                                <Binding Path="SourceType" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock Margin="0,0,15,0" 
+                       VerticalAlignment="Center" 
+                       HorizontalAlignment="Right"
+                       Foreground="{DynamicResource PaperTextEnabledBrush}"
+                       FontSize="18"
+                       Text="{Binding ShowSize, FallbackValue='SIZE'}"
+                       FontFamily="Segoe UI Light"/>
+
+                    <Label Margin="60,15,0,0" 
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Left" 
+                       Content="{Binding Path, FallbackValue='PATH/TO/FILE/OR/EXECUTABLE'}"
+                       FontSize="10"
+                       FontWeight="Bold"/>
+                    <!--<Label Margin="0,0,15,0" 
+                       VerticalAlignment="Center" 
+                       HorizontalAlignment="Right"
+                       Content="{Binding SourceType, FallbackValue='MEMORY SOURCE TYPE'}" 
+                       FontSize="18"
+                       
+                       FontFamily="Segoe UI Light"/>-->
+
+                </Grid>
+            </Border>
+
+            <!--Content-->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="320"/>
+                    <ColumnDefinition Width="3*" MinWidth="250"/>
+                    <ColumnDefinition Width="4*" MinWidth="380"/>
+                </Grid.ColumnDefinitions>
+
+                <!--Scan settings-->
+                <Grid Grid.Column="0"
+                  Grid.RowSpan="2">
+
+                    <Label Content="Scan" 
+                       HorizontalAlignment="Center"
+                       Margin="0,10,0,0"
+                       VerticalAlignment="Top"
+                       FontFamily="Segoe UI Light" 
+                       FontSize="16"/>
+
+                    <Label Content="Value1:"
+                       HorizontalAlignment="Left"
+                       Margin="20,52,0,0"
+                       VerticalAlignment="Top"/>
+                    <TextBox Height="23"
+                         Margin="101,49,10,0"
+                         TextWrapping="Wrap" 
+                         IsEnabled="{Binding ScanSettings.ValueOneEnabled}"
+                         Text="{Binding ScanSettings.ValueOne}"
+                         VerticalAlignment="Top"/>
+
+                    <Label Content="Value2:"
+                       IsEnabled="{Binding ScanSettings.MaxValueEnabled}"
+                       HorizontalAlignment="Left"
+                       Margin="20,80,0,0"
+                       VerticalAlignment="Top"/>
+                    <TextBox Height="23"
+                         Margin="101,77,10,0"
+                         TextWrapping="Wrap" 
+                         IsEnabled="{Binding ScanSettings.ValueTwoEnabled}"
+                         Text="{Binding ScanSettings.ValueTwo}"
+                         VerticalAlignment="Top"/>
+
+                    <Label Content="Data type:"
+                       HorizontalAlignment="Left"
+                       Margin="20,148,0,0"
+                       IsEnabled="{Binding ScanResults, Converter={StaticResource nullToBoolConverter}}"
+                       VerticalAlignment="Top"/>
+                    <ComboBox Margin="101,143,10,0"
+                          VerticalAlignment="Top"
+                          SelectedValue="{Binding ScanSettings.ScanDataType}"
+                          SelectedValuePath="Key"
+                          DisplayMemberPath="Value"
+                          ItemsSource="{Binding ScanSettings.ScanDataTypes}"
+                          IsEnabled="{Binding ScanResults, Converter={StaticResource nullToBoolConverter}}">
+                    </ComboBox>
+
+                    <Label Content="Mode:"
+                       HorizontalAlignment="Left" 
+                       Margin="20,177,0,0" 
+                       VerticalAlignment="Top"/>
+                    <ComboBox SelectedIndex="0"
+                          Margin="101,173,10,0"
+                          VerticalAlignment="Top"
+                          SelectedValue="{Binding ScanSettings.ScanMode}"
+                          SelectedValuePath="Key"
+                          DisplayMemberPath="Value"
+                          ItemsSource="{Binding ScanSettings.ScanModes}">
+                    </ComboBox>
+                    <CheckBox Content="Not" 
+                          HorizontalAlignment="Left"
+                          Margin="101,203,0,0"
+                          VerticalAlignment="Top"
+                          IsChecked="{Binding ScanSettings.ScanNot}"/>
+
+                    <Label Content="Min address:"
+                       HorizontalAlignment="Left"
+                       Margin="20,255,0,0"
+                       IsEnabled="{Binding ScanResults, Converter={StaticResource nullToBoolConverter}}"
+                       VerticalAlignment="Top"/>
+                    <TextBox Height="24" 
+                         Margin="111,251,10,0"
+                         TextWrapping="Wrap"
+                         Text="{Binding ScanSettings.HexMinAddress, FallbackValue='0000000000000000'}"
+                         VerticalAlignment="Top" FontFamily="Courier New"
+                         IsEnabled="{Binding ScanResults, Converter={StaticResource nullToBoolConverter}}"/>
+
+                    <Label Content="Max address:"
+                       HorizontalAlignment="Left"
+                       Margin="20,284,0,0"
+                       IsEnabled="{Binding ScanResults, Converter={StaticResource nullToBoolConverter}}"
+                       VerticalAlignment="Top"/>
+                    <TextBox Height="24"
+                         Margin="111,280,10,0" 
+                         TextWrapping="Wrap" 
+                         Text="{Binding ScanSettings.HexMaxAddress, FallbackValue='FFFFFFFFFFFFFFFF'}"
+                         VerticalAlignment="Top" FontFamily="Courier New"
+                         IsEnabled="{Binding ScanResults, Converter={StaticResource nullToBoolConverter}}"/>
+
+
+                    <CheckBox Content="Hex" 
+                          HorizontalAlignment="Left"
+                          Margin="101,105,0,0"
+                          VerticalAlignment="Top"
+                          ToolTip="Inverts the scan condition."
+                          IsChecked="{Binding ScanSettings.IsHex}"
+                          IsEnabled="{Binding ScanResults, Converter={StaticResource nullToBoolConverter}}"/>
+
+
+                    <Button Content="Scan"
+                        Height="28"
+                        VerticalAlignment="Top"
+                        Margin="20,475,80,0"
+                        Command="{Binding ScanCommand}"
+                        ToolTip="Start scan!"/>
+                    <Button Content="Clear"
+                        Margin="0,475,10,0" 
+                        HorizontalAlignment="Right"
+                        Width="65" 
+                        Height="28"
+                        IsEnabled="{Binding ScanResults, Converter={StaticResource nullToBoolInverseConverter}}"
+                        ToolTip="Clears the scan results."
+                        VerticalAlignment="Top"
+                        Command="{Binding ClearCommand}"/>
+                    <CheckBox Content="Step:"
+                                HorizontalAlignment="Left"
+                                Margin="20,313,0,0"
+                                VerticalAlignment="Top"
+                                IsChecked="{Binding ScanSettings.StepActive}"
+                                IsEnabled="{Binding ScanResults, Converter={StaticResource nullToBoolConverter}}"
+                                ToolTip="Usually values are stored at even increments, there is no point scanning half the end of one value and half the beginning of another."/>
+                    <TextBox Height="24"
+                            Margin="111,309,10,0" 
+                            TextWrapping="Wrap" 
+                            Text="{Binding ScanSettings.StepSize, FallbackValue=4}"
+                            VerticalAlignment="Top"
+                            IsEnabled="{Binding ScanResults, Converter={StaticResource nullToBoolConverter}}"/>
+                    <TextBlock Foreground="{DynamicResource PaperTextEnabledBrush}"
+                            Visibility="{Binding ScanResults, Converter={StaticResource nullToVisConverter}}"
+                            HorizontalAlignment="Left"
+                            Margin="20,528,0,0"
+                            VerticalAlignment="Top" FontFamily="Segoe UI Light" FontSize="16">
+                        <TextBlock.Text>
+                            <Binding Path="ScanTime" StringFormat="{}Scan completed in {0} ms!" FallbackValue="Scan completed in 200 ms!"/>
+                        </TextBlock.Text>
+                    </TextBlock>
+
+                    <Label Content="Performance" 
+                        HorizontalAlignment="Center"
+                        Margin="118,364,118,0"
+                        VerticalAlignment="Top"
+                        FontFamily="Segoe UI Light" 
+                        FontSize="16"/>
+
+                    <Label Content="Max results:"
+                            HorizontalAlignment="Left"
+                            Margin="20,402,0,0"
+                            VerticalAlignment="Top" />
+                    <TextBox Height="24"
+                            Margin="111,398,10,0" 
+                            TextWrapping="Wrap" 
+                            Text="{Binding ScanSettings.MaxResults, FallbackValue=10000}"
+                             ToolTip="Maximum amount of scan results."
+                            VerticalAlignment="Top"/>
+                    <Label Content="Scan threads:"
+                            HorizontalAlignment="Left"
+                            Margin="20,431,0,0"
+                            VerticalAlignment="Top" />
+                    <Slider x:Name="sldScanThreads"
+                            Minimum="1"
+                            Maximum="{Binding ScanSettings.MaxScanThreads}"
+                            Value="{Binding ScanSettings.ScanThreads}"
+                            Margin="111,430,73,0"
+                            ToolTip="Processor threads used to scan, more = faster scan."
+                            VerticalAlignment="Top"/>
+                    <TextBox Height="24"
+                            Margin="0,427,10,0" 
+                            TextWrapping="Wrap" 
+                            Text="{Binding ElementName=sldScanThreads, Path=Value}"
+                             HorizontalContentAlignment="Center"
+                             Padding="0"
+                             ToolTip="{Binding ElementName=sldScanThreads, Path=ToolTip}"
+                            VerticalAlignment="Top"
+                            HorizontalAlignment="Right" 
+                             Width="58"/>
+
+
+
+                </Grid>
+
+                <!--Scan result-->
+                <Grid Grid.Column="1">
+                    <TextBlock HorizontalAlignment="Left"
+                   Margin="10,6,0,0"
+                       
+                       Foreground="{DynamicResource PaperTextEnabledBrush}"
+                   VerticalAlignment="Top">
+                        <TextBlock.Text>
+                            <Binding ElementName="dgrScanResults" 
+                             Path="Items.Count"
+                             StringFormat="{}Scan results [{0}]"
+                             FallbackValue="Scan results"/>
+                        </TextBlock.Text>
+                    </TextBlock>
+
+                    <DataGrid x:Name="dgrScanResults" 
+                      ItemsSource="{Binding ScanResults}" 
+                      Margin="10,27,5,53"
+                      Grid.Row="0" 
+                      IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Address" 
+                                        Width="140"
+                                        Binding="{Binding ShowAddress}"/>
+                            <DataGridTextColumn Header="Value" 
+                                        Binding="{Binding ShowCurrentValue}"/>
+                            <DataGridTextColumn Header="Last" 
+                                        Binding="{Binding ShowLastValue}"/>
+                        </DataGrid.Columns>
+                        <DataGrid.InputBindings>
+                            <MouseBinding Gesture="LeftDoubleClick"
+                                  CommandParameter="{Binding ElementName=dgrScanResults, Path=SelectedItems}"
+                                  Command="{Binding TrackSelectedCommand}"/>
+                            <KeyBinding Key="Delete" 
+                                   CommandParameter="{Binding ElementName=dgrScanResults, Path=SelectedItems}"
+                                   Command="{Binding DeleteResultCommand}"/>
+                        </DataGrid.InputBindings>
+                    </DataGrid>
+
+                    <Button Content="Delete"
+                        Margin="0,0,90,20"
+                        VerticalAlignment="Bottom" 
+                        Height="28"
+                        HorizontalAlignment="Right" 
+                        Width="80"
+                        ToolTip="Delete selected scan results"
+                            IsEnabled="{Binding ElementName=dgrScanResults, Path=SelectedItem, Converter={StaticResource nullToBoolInverseConverter}}"
+                        CommandParameter="{Binding SelectedItems, ElementName=dgrScanResults}"
+                        Command="{Binding DeleteResultCommand}"/>
+                    <Button Content="Track" 
+                        Margin="0,0,5,20"
+                        HorizontalAlignment="Right"
+                        Width="80"
+                        Height="28" 
+                        ToolTip="Add selected scan results to list of tracked addresses"
+                        VerticalAlignment="Bottom"
+                            IsEnabled="{Binding ElementName=dgrScanResults, Path=SelectedItem, Converter={StaticResource nullToBoolInverseConverter}}"
+                        CommandParameter="{Binding SelectedItems, ElementName=dgrScanResults}"
+                        Command="{Binding TrackSelectedCommand}" />
+                    <Button Content="Update all"
+                        Margin="0,0,175,20" 
+                        HorizontalAlignment="Right" 
+                        Width="80" 
+                        Height="28"
+                        ToolTip="Reread memory at all scan results and update table (Not ReScan)."
+                        VerticalAlignment="Bottom"
+                        IsEnabled="{Binding ScanResults, Converter={StaticResource nullToBoolInverseConverter}}"
+                        Command="{Binding UpdateScanCommand}"/>
+                </Grid>
+
+                <GridSplitter Margin="0,0,-2,0" Grid.Column="1" Width="10" Style="{DynamicResource GridSplitterStyle1}"/>
+
+                <!--Tracked addresses-->
+                <Grid Grid.Column="2">
+                    <TextBlock HorizontalAlignment="Left"
+                   Margin="5,6,0,0"
+                       Foreground="{DynamicResource PaperTextEnabledBrush}"
+                       Grid.Row="0"
+                       Grid.Column="2"
+                   VerticalAlignment="Top">
+                        <TextBlock.Text>
+                            <Binding ElementName="dgrTrackedAddresses" 
+                             Path="Items.Count"
+                             StringFormat="{}Tracked addresses [{0}]"
+                             FallbackValue="Scan results"/>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <DataGrid x:Name="dgrTrackedAddresses"
+                      Grid.Column="2"
+                      SelectionMode="Extended"
+                      ItemsSource="{Binding TrackedAddresses}"
+                      Margin="5,27,20,53"
+                      Grid.Row="0" >
+                        <DataGrid.Columns>
+                            <!--<DataGridCheckBoxColumn Header="Lock" 
+                                        />-->
+                            <DataGridTextColumn Header="Address" 
+                                        Binding="{Binding ShowAddress}"
+                                        Width="140"/>
+                            <DataGridComboBoxColumn Header="Type"
+                                                    ItemsSource="{Binding Source={x:Static scan:ScanSettings.ScanDataTypes}}"
+                                                    SelectedValueBinding="{Binding DataType}"
+                                                    SelectedValuePath="Key" 
+                                                    DisplayMemberPath="Value" 
+                                                    EditingElementStyle="{DynamicResource DataGridComboboxColumn}"
+                                                    />
+
+                            <DataGridTextColumn Header="Value"
+                                        Binding="{Binding ShowCurrentValue}"
+                                        IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Last" 
+                                        Binding="{Binding ShowLastValue}"/>
+                            <DataGridTextColumn Header="Description"
+                                        Binding="{Binding Description}"/>
+                        </DataGrid.Columns>
+                        <DataGrid.InputBindings>
+                            <MouseBinding Gesture="LeftDoubleClick"
+                                   CommandParameter="{Binding ElementName=dgrTrackedAddresses, Path=SelectedItems}"
+                                   Command="{Binding WriteMemoryCommand}"/>
+                            <KeyBinding Key="Delete" 
+                                   CommandParameter="{Binding ElementName=dgrTrackedAddresses, Path=SelectedItems}"
+                                   Command="{Binding DeleteTrackCommand}"/>
+                        </DataGrid.InputBindings>
+                    </DataGrid>
+
+
+                    <Button Content="Write"
+                        Margin="0,0,20,20"
+                    VerticalAlignment="Bottom" 
+                    Height="28"
+                    ToolTip="Write to memory address, multiple addresses can be selected!"
+                            IsEnabled="{Binding ElementName=dgrTrackedAddresses, Path=SelectedItem, Converter={StaticResource nullToBoolInverseConverter}}"
+                    CommandParameter="{Binding SelectedItems, ElementName=dgrTrackedAddresses}"
+                    Command="{Binding WriteMemoryCommand}"
+                    HorizontalAlignment="Right" 
+                    Width="80"/>
+                    <Button Content="Delete"
+                        Margin="0,0,105,20"
+                        VerticalAlignment="Bottom" 
+                        Height="28"
+                        HorizontalAlignment="Right" 
+                        Width="80"
+                        ToolTip="Delete selected tracked addresses"
+                            IsEnabled="{Binding ElementName=dgrTrackedAddresses, Path=SelectedItem, Converter={StaticResource nullToBoolInverseConverter}}"
+                        CommandParameter="{Binding SelectedItems, ElementName=dgrTrackedAddresses}"
+                        Command="{Binding DeleteTrackCommand}"/>
+                    <Button Content="New"      
+                    Margin="0,0,190,20"   
+                    VerticalAlignment="Bottom"   
+                    Height="28"
+                    ToolTip="Manually add address to track"
+                    Command="{Binding TrackManualCommand}" 
+                    HorizontalAlignment="Right" 
+                    Width="80"/>
+
+                    <Button Content="Update selected"
+                        Margin="0,0,275,20" 
+                        HorizontalAlignment="Right" 
+                        Width="100" 
+                        Height="28"
+                        ToolTip="Reread memory for selected tracked addresses and update table."
+                        VerticalAlignment="Bottom"
+                        IsEnabled="{Binding ScanResults, Converter={StaticResource nullToBoolInverseConverter}}"
+                            CommandParameter="{Binding SelectedItems, ElementName=dgrTrackedAddresses}"
+                        Command="{Binding UpdateTrackedCommand}"/>
+                </Grid>
+
+
+
+
+
+
+            </Grid>
+        </Grid>
+
+        <!--Scan is active warning-->
+        <Grid Background="{DynamicResource ScanningOverlayBrush}"
+              Visibility="{Binding IsScanning, Converter={StaticResource booleanToHiddenConverter}, FallbackValue='Hidden'}" 
+              Grid.RowSpan="2">
+            <Label Content="Scanning"
+                   Margin="0,0,0,50"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center" 
+                   FontSize="26" 
+                   FontFamily="Segoe UI Light"/>
+            <ProgressBar Width="200" 
+                         Height="20"
+                         Value="{Binding ScanProgress.ProgressPercentage, FallbackValue=500}"
+                         VerticalAlignment="Center" 
+                         HorizontalAlignment="Center"
+                         Margin="0,20,0,0" 
+                         Maximum="1000"/>
+            <Label Content="{Binding ScanProgress.ScannedBytesText, FallbackValue='SCANNED BYTES'}" 
+                   Margin="0,70,0,0"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   FontSize="16"
+                   FontFamily="Segoe UI Light"/>
+            <TextBlock Foreground="{DynamicResource PaperTextEnabledBrush}"
+                       Margin="0,100,0,0"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   FontSize="12"
+                   FontFamily="Segoe UI Light">
+                <TextBlock.Text>
+                    <Binding Path="ScanProgress.ResultCount" StringFormat="{}{0} Results found" FallbackValue="0 RESULTS FOUND"/>
+                </TextBlock.Text>
+            </TextBlock>
+
+            <Button Content="Stop"
+                    Height="28" 
+                    Width="100"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center" 
+                    Margin="0,250,0,0"
+                    Command="{Binding StopScanCommand}"/>
+            <Label Content="*Stopping the scan will still yield the results found so far"
+                   Margin="0,310,0,0"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center" 
+                   FontSize="10" 
+                   FontFamily="Segoe UI Light"/>
+        </Grid>
+    </Grid>
+</Window>

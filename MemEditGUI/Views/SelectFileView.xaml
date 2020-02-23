@@ -1,0 +1,53 @@
+﻿<Window x:Class="MemEditGUI.Views.SelectFileView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MemEditGUI"
+        mc:Ignorable="d"
+        Background="{DynamicResource PaperBrush}"
+         Icon="/MemEditGUI;component/Icon.ico"
+        Title="Select file" 
+        Height="180"
+        Width="700"
+        WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize" >
+    <Grid>
+
+
+        <Button x:Name="btnOk"
+                Height="28"
+                Width="100" 
+                Content="Ok"
+                HorizontalAlignment="Right" 
+                Margin="0,0,25,25" 
+                VerticalAlignment="Bottom"
+                Command="{Binding OkCommand}"/>
+        
+        <Label Content="File:"
+               HorizontalAlignment="Left"
+               Margin="25,32,0,0"
+               VerticalAlignment="Top"/>
+        <TextBox Height="24"
+                 Margin="62,28,74,0"
+                 TextWrapping="Wrap"
+                 Text="{Binding Path}"
+                 VerticalAlignment="Top" />
+        <Button Content="..." 
+                HorizontalAlignment="Right" 
+                Margin="0,28,25,0" 
+                VerticalAlignment="Top" 
+                Width="44"
+                Height="24"
+                Command="{Binding BrowseCommand}"/>
+     
+        <Button x:Name="btnCancel"
+                Height="28" 
+                Width="100"
+                Content="Cancel"
+                HorizontalAlignment="Right" 
+                Margin="0,0,130,25"
+                VerticalAlignment="Bottom"
+                Command="{Binding CancelCommand}"/>
+
+    </Grid>
+</Window>
